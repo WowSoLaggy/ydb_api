@@ -1,0 +1,26 @@
+{
+  "name": "ydb_api",
+  "version": "1.0.0",
+  "main": "src/ydb_api.js",
+  "description": "A library for interacting with the YDB API",
+  "keywords": [
+    "ydb",
+    "api",
+    "node",
+    "js"
+  ],
+  "author": "WowSoLaggy wowsolaggy@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WowSoLaggy/ydb_api.git"
+  },
+  "scripts": {
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "@yandex-cloud/nodejs-sdk": "^2.6.1",
+    "ydb-sdk": "=5.3.2"
+  }
+}
