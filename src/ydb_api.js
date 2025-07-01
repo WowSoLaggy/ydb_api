@@ -1,53 +1,50 @@
-const { Driver, TypedData, getLogger, IamAuthService } = require('ydb-sdk');
+const { Driver, TypedData, IamAuthService } = require('ydb-sdk');
 
 
-function getSACredentialsFromJson(json_string) {
-  const payload = JSON.parse(json_string);
+function getSaCredentialsFromEnv() {
   return {
-      iamEndpoint: process.env.IAM_ENDPOINT || 'iam.api.cloud.yandex.net:443',
-      serviceAccountId: payload.service_account_id,
-      accessKeyId: payload.id,
-      privateKey: payload.private_key
+    iamEndpoint: process.env.IAM_ENDPOINT || 'iam.api.cloud.yandex.net:443',
+    serviceAccountId: process.env.YDB_SERVICE_ACCOUNT_ID,
+    accessKeyId: process.env.YDB_ID,
+    privateKey: process.env.YDB_PRIVATE_KEY
   };
 }
 
 
 class ydb_api {
-  constructor(ydb_endpoint, ydb_database_path) {
-    this.ydb_endpoint = ydb_endpoint;
-    if (!this.ydb_endpoint) {
+  constructor() {
+    if (!process.env.YDB_ENDPOINT) {
       throw new Error('YDB_ENDPOINT is not set');
     }
-    this.ydb_database_path = ydb_database_path;
-    if (!this.ydb_database_path) {
+    if (!process.env.YDB_DATABASE_PATH) {
       throw new Error('YDB_DATABASE_PATH is not set');
     }
-
-    this.logger = getLogger();
-
-    const credentials_json_string = process.env.YDB_CREDENTIALS;
-    if (!credentials_json_string) {
-      throw new Error('YDB_CREDENTIALS environment variable is not set');
-
+    if (!process.env.YDB_PRIVATE_KEY) {
+      throw new Error('YDB_PRIVATE_KEY is not set');
     }
-    const credentials = getSACredentialsFromJson(credentials_json_string);
-    this.authService = new IamAuthService(credentials);
+    if (!process.env.YDB_ID) {
+      throw new Error('YDB_ID is not set');
+    }
+    if (!process.env.YDB_SERVICE_ACCOUNT_ID) {
+      throw new Error('YDB_SERVICE_ACCOUNT_ID is not set');
+    }
+
+    const credentials = getSaCredentialsFromEnv();
+    const authService = new IamAuthService(credentials);
 
     this.driver = new Driver({
-      endpoint: this.ydb_endpoint,
-      database: this.ydb_database_path,
-      authService: this.authService});
+      endpoint: process.env.YDB_ENDPOINT,
+      database: process.env.YDB_DATABASE_PATH,
+      authService: authService});
   }
 
   async init() {
     try {
-      this.logger.debug('Driver initializing...');
       console.log('Driver initializing...');
-      await this.driver.ready(10000);
-      this.logger.debug('Driver initialized successfully');
+      await this.driver.ready(3000);
       console.log('Driver initialized successfully');
-    } catch (error) {
-      this.logger.error('Driver initialization error: ', error);
+    }
+    catch (error) {
       console.error('Driver initialization error: ', error);
       throw error;
     }
@@ -55,32 +52,21 @@ class ydb_api {
   }
 
   async query(query) {
-    let result = [];
-    const text_decoder = new TextDecoder();
-
+    let query_result;
     try {
       await this.driver.tableClient.withSession(async (session) => {
-        const query_result = await session.executeQuery(query);
-        if (query_result.resultSets && query_result.resultSets.length > 0) {
-          const rows = TypedData.createNativeObjects(query_result.resultSets[0]);
-          result = rows.map(row => {
-            const obj = {};
-            for (const [key, value] of Object.entries(row)) {
-              if (value instanceof Uint8Array) {
-                obj[key] = text_decoder.decode(value);
-              } else {
-                obj[key] = value;
-              }
-            }
-            return obj;
-          });
-        }
+        query_result = await session.executeQuery(query);
       });
-    } catch (error) {
+    }
+    catch (error) {
       this.logger.error('Error executing query:', error);
       throw error;
     }
-    return result;
+
+    if (query_result && query_result.resultSets && query_result.resultSets.length > 0) {
+      const rows = TypedData.createNativeObjects(query_result.resultSets[0]);
+      return rows;
+    }
   }
 
   async destroy() {

@@ -22,17 +22,19 @@ npm install
 
 Ensure that the following environment variables are set:
 
-- `YDB_CREDENTIALS`: JSON string containing the Service Account credentials.
-- `IAM_ENDPOINT` (optional): The IAM endpoint for Yandex Cloud (default: `iam.api.cloud.yandex.net:443`).
+- `YDB_ENDPOINT`: The endpoint of your YDB instance.
+- `YDB_DATABASE`: The path to your YDB database.
+- `YDB_SERVICE_ACCOUNT_ID`: The Service Account ID for authentication.
+- `YDB_ACCESS_KEY_ID`: The Access Key ID for authentication.
+- `YDB_PRIVATE_KEY`: The private key for the Service Account (use multiline string).
 
-The `YDB_CREDENTIALS` should be in the following JSON format:
-
-```json
-{
-  "service_account_id": "<your_service_account_id>",
-  "id": "<your_access_key_id>",
-  "private_key": "<your_private_key>"
-}
+Example of the .env file:
+```
+YDB_ENDPOINT="grpcs://ydb.serverless.yandexcloud.net:2135"
+YDB_DATABASE_PATH="/ru-central1/****************/*****************"
+YDB_PRIVATE_KEY="PLEASE DO NOT REMOVE THIS LINE! Yandex.Cloud SA Key ID .... \n-----END PRIVATE KEY-----\n"
+YDB_ID="******************"
+YDB_SERVICE_ACCOUNT_ID="******************"
 ```
 
 ## Usage
@@ -40,13 +42,10 @@ The `YDB_CREDENTIALS` should be in the following JSON format:
 Here's an example of how to use the `ydb_api` class in your project:
 
 ```javascript
-const YdbApi = require('./path_to_ydb_api_file');
-
-const ydbEndpoint = 'your_ydb_endpoint';
-const ydbDatabasePath = 'your_ydb_database_path';
+const ydb_api = require('./path_to_ydb_api_file');
 
 (async () => {
-  const ydb = new YdbApi(ydbEndpoint, ydbDatabasePath);
+  const ydb = await new ydb_api().init();
 
   try {
     const query = 'YOUR YQL QUERY HERE';
@@ -59,39 +58,6 @@ const ydbDatabasePath = 'your_ydb_database_path';
   }
 })();
 ```
-
-## API
-
-### Constructor
-
-#### `new ydb_api(ydb_endpoint, ydb_database_path)`
-
-- `ydb_endpoint`: The endpoint of your YDB.
-- `ydb_database_path`: The path to your YDB database.
-
-### Methods
-
-#### `async init()`
-
-Initializes the YDB driver. This method is called automatically during instantiation.
-
-#### `async query(query)`
-
-Executes the provided YQL query and returns the results.
-
-- `query`: The YQL query to be executed.
-
-#### `async destroy()`
-
-Destroys the YDB driver instance, ensuring all resources are properly released.
-
-## Logging
-
-This project uses the built-in logging capabilities of the YDB SDK. Logs are generated for driver initialization, query execution, and errors.
-
-## Error Handling
-
-Errors during driver initialization and query execution are logged and re-thrown for proper handling by the calling code.
 
 ## Contributing
 
