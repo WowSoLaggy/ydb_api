@@ -15,7 +15,13 @@ function getSACredentialsFromJson(json_string) {
 class ydb_api {
   constructor(ydb_endpoint, ydb_database_path) {
     this.ydb_endpoint = ydb_endpoint;
+    if (!this.ydb_endpoint) {
+      throw new Error('YDB_ENDPOINT is not set');
+    }
     this.ydb_database_path = ydb_database_path;
+    if (!this.ydb_database_path) {
+      throw new Error('YDB_DATABASE_PATH is not set');
+    }
 
     this.logger = getLogger();
 
@@ -31,19 +37,21 @@ class ydb_api {
       endpoint: this.ydb_endpoint,
       database: this.ydb_database_path,
       authService: this.authService});
-
-    this.init();
   }
 
   async init() {
     try {
       this.logger.debug('Driver initializing...');
+      console.log('Driver initializing...');
       await this.driver.ready(10000);
       this.logger.debug('Driver initialized successfully');
+      console.log('Driver initialized successfully');
     } catch (error) {
       this.logger.error('Driver initialization error: ', error);
+      console.error('Driver initialization error: ', error);
       throw error;
     }
+    return this;
   }
 
   async query(query) {
