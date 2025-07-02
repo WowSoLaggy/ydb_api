@@ -21,7 +21,7 @@ async function select_all(ydb) {
 
     const result = await ydb.query(query);
     console.log('Select all results:');
-    console.log(result);
+    result.forEach(row => console.log(row));
   } catch (error) {
     console.error('Error executing query:', error);
     throw error;

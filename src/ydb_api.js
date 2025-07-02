@@ -65,7 +65,21 @@ class ydb_api {
 
     if (query_result && query_result.resultSets && query_result.resultSets.length > 0) {
       const rows = TypedData.createNativeObjects(query_result.resultSets[0]);
-      return rows;
+      const text_decoder = new TextDecoder();
+
+      // Convert TypedData rows to plain objects and decode Uint8Array values to strings.
+      // Note: YDB returns strings as Uint8Array
+      const result = rows.map(row => {
+        const decoded = {};
+        for (const [key, value] of Object.entries(row)) {
+          decoded[key] = value instanceof Uint8Array
+            ? text_decoder.decode(value)
+            : value;
+        }
+        return decoded;
+      });
+
+      return result;
     }
   }
 
