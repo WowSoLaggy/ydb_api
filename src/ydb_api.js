@@ -1,14 +1,4 @@
-const { Driver, TypedData, IamAuthService } = require('ydb-sdk');
-
-
-function getSaCredentialsFromEnv() {
-  return {
-    iamEndpoint: process.env.IAM_ENDPOINT || 'iam.api.cloud.yandex.net:443',
-    serviceAccountId: process.env.YDB_SERVICE_ACCOUNT_ID,
-    accessKeyId: process.env.YDB_ACCESS_KEY_ID,
-    privateKey: process.env.YDB_PRIVATE_KEY
-  };
-}
+const { Driver, TypedData, IamAuthService, getSACredentialsFromJson } = require('ydb-sdk');
 
 
 class ydb_api {
@@ -19,18 +9,12 @@ class ydb_api {
     if (!process.env.YDB_DATABASE_PATH) {
       throw new Error('YDB_DATABASE_PATH is not set');
     }
-    if (!process.env.YDB_PRIVATE_KEY) {
-      throw new Error('YDB_PRIVATE_KEY is not set');
-    }
-    if (!process.env.YDB_ACCESS_KEY_ID) {
-      throw new Error('YDB_ACCESS_KEY_ID is not set');
-    }
-    if (!process.env.YDB_SERVICE_ACCOUNT_ID) {
-      throw new Error('YDB_SERVICE_ACCOUNT_ID is not set');
+    if (!process.env.ACCESS_KEY_PATH) {
+      throw new Error('ACCESS_KEY_PATH is not set');
     }
 
-    const credentials = getSaCredentialsFromEnv();
-    const authService = new IamAuthService(credentials);
+    const saCredentials = getSACredentialsFromJson(process.env.ACCESS_KEY_PATH);
+    const authService = new IamAuthService(saCredentials);
 
     this.driver = new Driver({
       endpoint: process.env.YDB_ENDPOINT,
