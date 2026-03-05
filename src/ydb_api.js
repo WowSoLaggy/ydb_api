@@ -5,7 +5,7 @@ function getSaCredentialsFromEnv() {
   return {
     iamEndpoint: process.env.IAM_ENDPOINT || 'iam.api.cloud.yandex.net:443',
     serviceAccountId: process.env.YDB_SERVICE_ACCOUNT_ID,
-    accessKeyId: process.env.YDB_ID,
+    accessKeyId: process.env.YDB_ACCESS_KEY_ID,
     privateKey: process.env.YDB_PRIVATE_KEY
   };
 }
@@ -22,8 +22,8 @@ class ydb_api {
     if (!process.env.YDB_PRIVATE_KEY) {
       throw new Error('YDB_PRIVATE_KEY is not set');
     }
-    if (!process.env.YDB_ID) {
-      throw new Error('YDB_ID is not set');
+    if (!process.env.YDB_ACCESS_KEY_ID) {
+      throw new Error('YDB_ACCESS_KEY_ID is not set');
     }
     if (!process.env.YDB_SERVICE_ACCOUNT_ID) {
       throw new Error('YDB_SERVICE_ACCOUNT_ID is not set');

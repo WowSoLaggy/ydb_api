@@ -33,7 +33,7 @@ Example of the .env file:
 YDB_ENDPOINT="grpcs://ydb.serverless.yandexcloud.net:2135"
 YDB_DATABASE_PATH="/ru-central1/****************/*****************"
 YDB_PRIVATE_KEY="PLEASE DO NOT REMOVE THIS LINE! Yandex.Cloud SA Key ID .... \n-----END PRIVATE KEY-----\n"
-YDB_ID="******************"
+YDB_ACCESS_KEY_ID="******************"
 YDB_SERVICE_ACCOUNT_ID="******************"
 ```
 
