@@ -59,7 +59,7 @@ class ydb_api {
       });
     }
     catch (error) {
-      this.logger.error('Error executing query:', error);
+      console.error('Error executing query:', error);
       throw error;
     }
 
