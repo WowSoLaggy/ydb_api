@@ -49,6 +49,8 @@ async function delete_test_values(ydb) {
 
 
 async function run_query() {
+  console.log('Starting YDB test...');
+
   if (!ydb_endpoint) {
     throw new Error('YDB_ENDPOINT is not set');
   }
@@ -70,6 +72,8 @@ async function run_query() {
   await select_all(ydb);
 
   await ydb.destroy();
+
+  console.log('YDB test completed');
 }
 
 
